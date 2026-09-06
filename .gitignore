@@ -1,0 +1,4 @@
+.env
+__pycache__/
+*.py[cod]
+vc_report.txt
