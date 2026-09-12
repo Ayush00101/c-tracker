@@ -57,9 +57,38 @@ Additional commands include:
 - `/recap` for a user's weekly voice summary and daily breakdown
 - `/timecapsule` for a historical weekly snapshot or two-week comparison
 - `/progress` for progress toward the next weekly rank and overall milestone
+- `/timeline` for a personal VC journey timeline, unlocked at 50 lifetime hours
+- `/roulette` for one of exactly 150 temporary VC roles/stat effects lasting
+  two hours
 - `/goal` to set a daily, weekly, or monthly voice-time goal
+- `/mygoal` to view goal progress with boxed progress bars and a weekly breakdown
+- `/duel` to challenge another member to an animated weekly VC duel; optionally
+  select one phase (Morning, Evening, Night, or Midnight) for every round.
+  Each completed round shows a five-second countdown before the next round,
+  and the duel ends immediately when either fighter wins four rounds.
+- `/lastduel` to view the latest completed duel round summary
 - `/achievements` with weekly, monthly, daily, streak, and 50-hour milestones
 - `/vcstats` for voice-channel rankings
+- `/channelstats` for detailed usage, busiest hours, average sessions, and
+  most active members in a selected voice channel
+- `/heatmap` for a graph-style IST weekly activity heatmap using two-hour cells
+- `/bossbattle` to summon a 24-hour VC boss scaled from recent weekly activity;
+  party VC time deals damage, 10% alerts show damage leaders, and victories
+  award crowns that last 24 hours. Additional players can join while the boss
+  is active by entering a tracked VC; grouped players deal bonus damage.
+  Every 25 minutes of a player's battle VC time increases their personal
+  damage multiplier by an additive 10%, capped at 175% per player. Boss
+  health is a numeric HP value based on the party's average daily VC time for
+  the current week, with a minimum of 200,000 HP. Optional earned
+  powerups can be used with the command while a boss is active. Reusing the
+  command shows live battle stats; the boss appears first, followed by four
+  player cards per page with Previous/Next controls. Damage is measured every
+  minute but committed to the battle every five minutes. Boss base HP is at
+  least 200,000 HP.
+- `/quest` for one daily quest from exactly 50 voice-channel-based quests.
+  The public quest embed includes a practical hint explaining how to complete
+  the objective; 10% of assignments ask for the hidden daily Wordle answer.
+- `/powerups` to view earned boss-only powerups in a public embed.
 - `/museum` for historical server records and notable VC achievements
 - `/lobotomykaisen` for the ranked eight-page meme gallery with emoji navigation
 - `/history` for the owner's paginated channel history

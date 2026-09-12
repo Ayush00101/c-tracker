@@ -1,0 +1,289 @@
+PROJECT HANDOFF - DISCORD VOICE TRACKER BOT
+============================================
+
+Purpose
+-------
+This is a Python discord.py bot for one configured Discord server. It tracks
+non-bot users in voice channels, stores completed sessions in a JSON report,
+and exposes slash commands for profiles, rankings, history, achievements,
+goals, comparisons, facts, and fun features.
+
+Repository
+----------
+Project path: D:\Ayush\music tracker bot
+Main file: bot.py
+Runtime: Python 3.12 on Windows
+Dependencies:
+  - discord.py>=2.4,<3
+  - python-dotenv>=1.0,<2
+
+Safe startup
+------------
+1. Do not overwrite or reset vc_report.json. It contains historical activity.
+2. Back it up before making schema changes:
+     Copy-Item vc_report.json vc_report.backup.json
+3. Create/activate the virtual environment:
+     py -m venv .venv
+     .\.venv\Scripts\Activate.ps1
+     pip install -r requirements.txt
+4. Configure .env using .env.example.
+5. Run:
+     py bot.py
+
+Environment variables
+---------------------
+DISCORD_TOKEN
+  Bot token. Never commit or expose it. Rotate it if it was exposed.
+TRACKED_GUILD_ID
+  The single server ID. Commands such as leaderboard and timecapsule are
+  intended for this configured server.
+TRACKED_VOICE_CHANNEL_ID
+  Owner-specific channel used by cprofile.
+MAIN_ID
+  Bot owner's Discord user ID.
+REPORT_FILE
+  JSON report path. Current data uses vc_report.json.
+
+Persistence and compatibility
+-----------------------------
+bot.py loads REPORT_FILE as JSON and preserves existing guilds, users, sessions,
+and unknown fields. It adds missing schema defaults in memory. Data is saved
+atomically through a temporary file and replace operation.
+
+The current imported report has guild 1401597431522787481 and four users with
+historical sessions. Owner data may be partitioned into "specific" and "other"
+reports. Do not replace this file with an empty test report.
+
+Important data rules
+--------------------
+- Bot accounts are ignored.
+- A session shorter than five minutes is not saved.
+- Leaving and rejoining within ten minutes merges into the previous session.
+- The merge works across voice channels.
+- Times shown to users use IST (UTC+05:30).
+- Weekly periods start Sunday at 12:00 AM IST.
+- Active sessions are included in live statistics where implemented.
+
+Current slash commands
+----------------------
+/profile
+  Optional user profile. Shows total time, longest session, session count,
+  streak, current weekly rank, last sessions, and a weekly graph button.
+  The profile title puts rank beside the name, for example:
+  "Ayushwa - C ka Bacha Hai Tu's VC Timings".
+
+/achievements
+  Optional user. Shows weekly, monthly, daily statistics, streak, and
+  persistent 50-hour milestones through 500 hours with badges and timestamps.
+
+/recap
+  Optional user. Shows weekly total, rank, and a seven-day breakdown. Includes
+  the profile-style weekly graph button.
+
+/progress
+  Optional user. Shows progress toward the next weekly rank and next overall
+  50-hour milestone.
+
+/timeline
+  Shows the invoking user's VC journey, including their first recorded join,
+  unlocked milestones, and recent sessions. It unlocks only at 50 lifetime
+  hours; the owner follows the same restriction but receives a special
+  tongue-in-cheek owner message.
+
+/roulette
+  Selects one of exactly 150 temporary VC role/stat effects. The effect is
+  shown in the roulette embed and profile, remains active for two hours, then
+  is automatically removed without changing permanent VC history.
+
+/goal
+  Sets a persistent goal. Default period is daily when no period is selected.
+  Supports daily, weekly, and monthly. Existing goals require button
+  confirmation before overwrite. The goal value persists; daily progress
+  resets with the IST day.
+
+/mygoal
+  Shows the invoking user's daily, weekly, and monthly goal progress with
+  boxed progress bars. Weekly goals also include the seven-day graph-style
+  breakdown.
+
+/duel
+  Challenges another non-bot member. The message counts down from five,
+  allows each fighter to choose Past (last week) or Present (this week) once,
+  and optionally accepts one phase (Morning, Evening, Night, or Midnight) to
+  use for every round. It then animates up to seven daily rounds. Each day has four IST phases:
+  Morning 8 AM-2 PM, Evening 2 PM-8 PM, Night 8 PM-2 AM, and Midnight 2 AM-8 AM.
+  Phase text is revealed word by word. After each completed round, a visible
+  five-second countdown leads into the next round. The duel stops immediately
+  when either fighter wins four rounds. The final winner is based on rounds won.
+
+/lastduel
+  Shows the invoking user's latest saved duel, including arena, final score,
+  winner, and one field per day/round.
+
+/channelstats
+  Accepts an optional voice channel and shows total usage, session count,
+  average session length, busiest IST hour, and the five most active members.
+  Without a channel, it uses the busiest recorded channel.
+
+/heatmap
+  Shows a graph-style heatmap for the current IST week. Rows are days and
+  columns are two-hour blocks from midnight through 10 PM; darker cells mean
+  more recorded VC time.
+
+/bossbattle
+  Summons one persistent 24-hour boss per guild using all non-bot members in
+  tracked voice channels at invocation. Combined VC time after summoning deals
+  damage. HP is scaled from the party's recent weekly average with a random
+  0.75x-1.15x factor and a four-hour minimum. Alerts are posted every 10%
+  with remaining health, ETA, and damage leaders. A timeout posts a huge-loss
+  message naming the summoned players; victory awards each participant a crown
+  for 24 hours. New players who enter a tracked VC while the boss is active
+  are added to the battle. Active participants sharing a VC receive a
+  per-minute group damage multiplier. Each 25 minutes of a player's battle
+  VC time adds another additive 10% to that player's damage, capped at 175%.
+  Boss HP scales with party size and the shared-VC bonus. Optional quest
+  powerups can be consumed with `/bossbattle`. HP is numeric battle health
+  derived from the party's average daily VC time for the current week, with a
+  200,000 HP minimum. Reusing the command shows a
+  paginated status embed with boss stats first and four 2x2 player cards per
+  page. Damage is sampled every minute but snapshots change every five
+  minutes. Boss base HP is at least 200,000 HP.
+
+/quest
+  Assigns one daily quest from exactly 50 generated voice-channel-based
+  quests. The public quest embed includes a practical hint explaining what
+  action completes the objective. Ten percent of assignments are Wordle-answer
+  quests using a deterministic daily answer source, with a submission hint.
+  Completing a quest awards one boss-only powerup.
+
+/powerups
+  Shows the invoking user's boss-only powerup inventory in a public embed.
+  Powerups are consumed through `/bossbattle` while an encounter is active.
+
+/timecapsule
+  Accepts an optional week date in YYYY-MM-DD format and an optional second
+  comparison week. Shows historical weekly users/channels and plus/minus
+  deltas. Current implementation provides the main comparison embed.
+
+/leaderboard
+  Optional daily, weekly, or monthly user leaderboard.
+
+/vcstats
+  Voice-channel activity leaderboard.
+
+/museum
+  Historical records: longest single session, user with most total time,
+  busiest channel, and peak activity day.
+
+/lobotomykaisen
+  Eight-page ranked image gallery. Reads meme/1.jpg through meme/8.jpg, with
+  meme/4.png supported as a fallback. Uses emoji previous/next buttons, current
+  page text, and captions in the requested order.
+
+/current
+  Lists non-bot users currently connected to voice channels.
+
+/history
+  Owner-only paginated voice-channel history, ten entries per page.
+
+/csv
+  Owner-only CSV report sent to the owner's DMs.
+
+/cprofile
+  Owner and authorized users can view the owner's specific-channel profile.
+
+/add
+  Owner-only command to authorize another member for cprofile.
+
+Duel persistence
+----------------
+duel.py contains phase/date helpers and JSON persistence. Duel results are
+stored in duels.json (ignored by Git) and loaded at startup. The store records
+the fighters, selected week, winner, round totals, and daily round summaries.
+Only one active duel may involve a user at a time.
+
+Ranks and colors
+----------------
+Weekly ranks reset each Sunday at midnight IST:
+  0-5 hours: Chodu
+  5-10 hours: Tip Of Dihh
+  10-15 hours: C ka Bacha Hai Tu
+  15-20 hours: "C"hootad Licker
+  20-25 hours: Pointer To Pussy
+  25-30 hours: Munnu Ke Niche Ho Abhi Bhi
+  30-35 hours: Rukja Bhai
+  35+ hours: Bas Kar BhosadiKe Kitna Padhega
+
+Embed accent colors are selected from the current weekly rank. Discord does
+not support coloring only part of an embed title, so the title text cannot
+color the rank independently.
+
+Achievements
+------------
+Persistent overall milestones exist every 50 hours from 50 through 500.
+Milestone records contain hours, a badge, and achieved_at. Weekly rank-up
+notifications are sent to the member and achievement channel
+1401597433057771613 where Discord permissions allow.
+
+Facts
+-----
+fun_facts.py contains an offline 1,000-entry template bank:
+  dank 250, dark 200, adult 150, history 80, gaming 70,
+  productivity 70, food 60, sleep 60, programming 60.
+
+Facts are generated locally, avoid recently used fact IDs, round fact times to
+whole hours, and are placed in the small footer of profile, achievements,
+recap, and progress embeds. They are not an external AI/API feature.
+
+Meme gallery
+------------
+Directory: meme
+Files currently expected:
+  1.jpg, 2.jpg, 3.jpg, 4.png, 5.jpg, 6.jpg, 7.jpg, 8.jpg
+
+Captions, in order:
+  1. Real Footage of GOJO VS SUKUNA
+  2. Mil Gaya Mahoraga (GEGE PLEASE)
+  3. Mahoraga Daddy Save Me Please
+  4. Agito AUR Mahoraga Come to Save Sukuna
+  5. Agito and Mahoraga Hold Hands with Sukuna AWWW
+  6. Sukuna OF Leaked
+  7. Adaptation of D begins
+  8. Actually Mahoraga with Sukuna (leaked)
+
+Recent history and user preferences
+------------------------------------
+- The user requested a step-by-step Python discord.py bot originally.
+- The bot was expanded from basic tracking into ranks, streaks, graphs,
+  achievements, facts, goals, recaps, timecapsules, museum records, and a
+  meme gallery.
+- The user accidentally pressed Ctrl+Z. A later audit found recap, progress,
+  goal, and timecapsule missing; those commands and helpers were restored.
+- Always run py_compile and inspect the command inventory after edits.
+- Keep existing report data and do not use destructive git/file commands.
+- Use apply_patch for edits.
+- Current data file is intentionally local and should not be committed.
+
+Recommended validation
+----------------------
+Syntax:
+  py -3 -m py_compile bot.py fun_facts.py
+
+Command inventory:
+  import bot
+  print(sorted(command.name for command in bot.tree.get_commands()))
+
+Expected command names:
+  add, achievements, cprofile, csv, current, duel, goal, history, lastduel,
+  leaderboard, lobotomykaisen, museum, mygoal, profile, progress, recap,
+  timecapsule, vcstats
+
+Known caveats for the next agent
+--------------------------------
+- The README may describe some older behavior; treat bot.py as authoritative.
+- The report schema is backward-compatible for the existing JSON structure but
+  arbitrary plaintext reports require a migration, not direct loading.
+- Slash commands synchronize to TRACKED_GUILD_ID on bot ready for fast testing.
+- Discord title text cannot have independently colored substrings.
+- Do not expose the real .env token or copy it into any response or commit.
+- Before adding a feature, search bot.py for existing helpers and reuse them.
