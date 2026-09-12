@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-12T11:53:38.511865+00:00",
+  "generated_at": "2026-09-12T17:47:30.180158+00:00",
   "guilds": {
     "1401597431522787481": {
       "guild_name": "backchodi ka kila",
@@ -85,7 +85,13 @@
                 "duration_seconds": 4488
               }
             ]
-          }
+          },
+          "daily_streak": 7,
+          "last_active_date": "2026-09-12",
+          "milestones": [],
+          "recent_fact_ids": [
+            "dark-071"
+          ]
         },
         "692792854501916742": {
           "user_name": "AyuZen",
@@ -189,6 +195,13 @@
               "left_at": "2026-09-12T11:53:38.511830+00:00",
               "duration_seconds": 6077
             }
+          ],
+          "daily_streak": 6,
+          "last_active_date": "2026-09-12",
+          "milestones": [],
+          "recent_fact_ids": [
+            "history-059",
+            "dank-250"
           ]
         },
         "1401979293608706141": {
@@ -244,6 +257,12 @@
               "left_at": "2026-09-12T11:52:48.882137+00:00",
               "duration_seconds": 6026
             }
+          ],
+          "daily_streak": 1,
+          "last_active_date": "2026-09-12",
+          "milestones": [],
+          "recent_fact_ids": [
+            "history-004"
           ]
         },
         "944016826751389717": {
@@ -264,8 +283,38 @@
               "left_at": "2026-09-08T20:00:24.706764+00:00",
               "duration_seconds": 1001
             }
-          ]
+          ],
+          "daily_streak": 0,
+          "last_active_date": "",
+          "milestones": [],
+          "recent_fact_ids": []
         }
+      },
+      "goals": {},
+      "guild_id": 1401597431522787481
+    }
+  },
+  "cprofile_users": [],
+  "weekly_state": {
+    "period_start": "2026-09-05T18:30:00+00:00",
+    "users": {
+      "1401979293608706141": {
+        "rank_index": 1,
+        "notified_rank_index": 1,
+        "label": "Tip Of Dihh",
+        "weekly_seconds": 20669
+      },
+      "692792854501916742": {
+        "rank_index": 2,
+        "notified_rank_index": 2,
+        "label": "C ka Bacha Hai Tu",
+        "weekly_seconds": 51963
+      },
+      "779287782928547880": {
+        "rank_index": 2,
+        "notified_rank_index": 2,
+        "label": "C ka Bacha Hai Tu",
+        "weekly_seconds": 41638
       }
     }
   }

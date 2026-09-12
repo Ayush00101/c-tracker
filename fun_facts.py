@@ -96,10 +96,15 @@ TEMPLATES: dict[str, tuple[str, ...]] = {
 }
 
 
+class _DisplayHours(float):
+    def __format__(self, format_spec: str) -> str:
+        return f"{round(float(self))} hours"
+
+
 def _values(index: int, total_seconds: int) -> dict[str, Any]:
     hours = max(0, total_seconds) / 3600
     return {
-        "hours": hours,
+        "hours": _DisplayHours(hours),
         "number": max(1, int(hours * 6) + (index * 7) % 41),
     }
 

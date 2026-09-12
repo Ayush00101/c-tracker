@@ -60,6 +60,8 @@ Additional commands include:
 - `/goal` to set a daily, weekly, or monthly voice-time goal
 - `/achievements` with weekly, monthly, daily, streak, and 50-hour milestones
 - `/vcstats` for voice-channel rankings
+- `/museum` for historical server records and notable VC achievements
+- `/lobotomykaisen` for the ranked eight-page meme gallery with emoji navigation
 - `/history` for the owner's paginated channel history
 - `/csv` for an owner-only CSV export sent by DM
 

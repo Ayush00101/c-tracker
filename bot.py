@@ -10,6 +10,7 @@ from typing import Any
 import discord
 from discord import app_commands
 from dotenv import load_dotenv
+from fun_facts import choose_fact
 
 
 load_dotenv()
@@ -25,6 +26,7 @@ def _optional_int(value: str | None) -> int | None:
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 REPORT_PATH = Path(os.getenv("REPORT_FILE", "vc_report.txt"))
+MEME_DIR = Path(__file__).with_name("meme")
 TRACKED_GUILD_ID = _optional_int(os.getenv("TRACKED_GUILD_ID"))
 TRACKED_VOICE_CHANNEL_ID = _optional_int(os.getenv("TRACKED_VOICE_CHANNEL_ID"))
 MAIN_ID = _optional_int(os.getenv("MAIN_ID"))
@@ -92,6 +94,21 @@ def format_duration(seconds: int) -> str:
     if hours == 0 and days == 0:
         parts.append(f"{seconds}s")
     return " ".join(parts)
+
+
+def format_hours_minutes(seconds: int) -> str:
+    total_minutes = max(0, int(seconds)) // 60
+    hours, minutes = divmod(total_minutes, 60)
+    return f"{hours}h {minutes:02d}m"
+
+
+def user_fact(guild_report: dict[str, Any], member_id: int, total_seconds: int) -> str:
+    user_record = guild_report.get("users", {}).get(str(member_id), {})
+    recent_ids = set(user_record.get("recent_fact_ids", []))
+    fact = choose_fact(total_seconds, recent_ids=recent_ids)
+    recent_ids.add(fact["id"])
+    user_record["recent_fact_ids"] = list(recent_ids)[-20:]
+    return fact["text"]
 
 
 def month_bounds(now: datetime) -> tuple[datetime, datetime]:
@@ -402,6 +419,7 @@ def ensure_report_schema() -> None:
             user_record.setdefault("daily_streak", 0)
             user_record.setdefault("last_active_date", "")
             user_record.setdefault("milestones", [])
+            user_record.setdefault("recent_fact_ids", [])
 
 
 def session_seconds_in_range(
@@ -523,7 +541,6 @@ async def send_achievement_notification(
             member = await guild.fetch_member(member_id)
         except (discord.HTTPException, discord.NotFound):
             return
-    hours = seconds / 3600
     embed = discord.Embed(
         title="🎉 Weekly achievement unlocked!",
         description=f"Congratulations {member.mention}!",
@@ -531,7 +548,7 @@ async def send_achievement_notification(
         timestamp=utc_now(),
     )
     embed.add_field(name="Achievement", value=label, inline=True)
-    embed.add_field(name="Weekly voice time", value=f"{hours:.2f} hours", inline=True)
+    embed.add_field(name="Weekly voice time", value=format_hours_minutes(seconds), inline=True)
     try:
         await member.send(embed=embed)
     except (discord.Forbidden, discord.HTTPException):
@@ -819,7 +836,7 @@ def weekly_graph_embed(
     for day, seconds in values:
         bar_length = int(seconds / max_seconds * 12) if max_seconds else 0
         bar = "▰" * bar_length or "—"
-        lines.append(f"**{day.strftime('%a %d %b')}**  {bar} {seconds / 3600:.2f}h")
+        lines.append(f"**{day.strftime('%a %d %b')}**  {bar} {format_hours_minutes(seconds)}")
     embed = discord.Embed(
         title=f"{member.display_name}'s Weekly Graph",
         description="\n".join(lines) or "No voice activity recorded this week.",
@@ -872,6 +889,102 @@ class ProfileView(discord.ui.View):
         button.disabled = True
         self.graph_button.disabled = False
         await interaction.response.edit_message(embed=self.profile_embed, view=self)
+
+
+MEME_CAPTIONS = (
+    "Real Footage of GOJO VS SUKUNA",
+    "Mil Gaya Mahoraga (GEGE PLEASE)",
+    "Mahoraga Daddy Save Me Please",
+    "Agito AUR Mahoraga Come to Save Sukuna",
+    "Agito and Mahoraga Hold Hands with Sukuna AWWW",
+    "Sukuna OF Leaked",
+    "Adaptation of D begins",
+    "Actually Mahoraga with Sukuna (leaked)",
+)
+
+
+def meme_path(page: int) -> Path:
+    jpg_path = MEME_DIR / f"{page}.jpg"
+    if jpg_path.exists():
+        return jpg_path
+    png_path = MEME_DIR / f"{page}.png"
+    if png_path.exists():
+        return png_path
+    raise FileNotFoundError(f"Missing meme image for page {page}: {jpg_path}")
+
+
+def meme_embed(
+    member: discord.Member,
+    rank: str,
+    rank_index: int,
+    page: int,
+    requested_by: str,
+) -> discord.Embed:
+    embed = discord.Embed(
+        title=f"{member.display_name} • {rank}",
+        description=MEME_CAPTIONS[page - 1],
+        color=achievement_color(rank_index),
+        timestamp=utc_now(),
+    )
+    embed.set_image(url=f"attachment://meme-{page}.jpg")
+    embed.set_footer(text=f"{page}/{len(MEME_CAPTIONS)} • Requested By {requested_by}")
+    return embed
+
+
+class MemeView(discord.ui.View):
+    def __init__(
+        self,
+        requester_id: int,
+        member: discord.Member,
+        rank: str,
+        rank_index: int,
+    ) -> None:
+        super().__init__(timeout=180)
+        self.requester_id = requester_id
+        self.member = member
+        self.rank = rank
+        self.rank_index = rank_index
+        self.page = 1
+        self.previous_button.disabled = True
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.requester_id:
+            await interaction.response.send_message(
+                "Only the command user can change meme pages.", ephemeral=True
+            )
+            return False
+        return True
+
+    async def render(self, interaction: discord.Interaction) -> None:
+        self.previous_button.disabled = self.page == 1
+        self.next_button.disabled = self.page == len(MEME_CAPTIONS)
+        image_path = meme_path(self.page)
+        file = discord.File(image_path, filename=f"meme-{self.page}.jpg")
+        await interaction.response.edit_message(
+            embed=meme_embed(
+                self.member,
+                self.rank,
+                self.rank_index,
+                self.page,
+                interaction.user.display_name,
+            ),
+            attachments=[file],
+            view=self,
+        )
+
+    @discord.ui.button(label="⬅️", style=discord.ButtonStyle.secondary)
+    async def previous_button(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ) -> None:
+        self.page -= 1
+        await self.render(interaction)
+
+    @discord.ui.button(label="➡️", style=discord.ButtonStyle.secondary)
+    async def next_button(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ) -> None:
+        self.page += 1
+        await self.render(interaction)
 
 
 class GoalOverwriteView(discord.ui.View):
@@ -1059,9 +1172,9 @@ async def profile(
     weekly_rank_index, weekly_rank = achievement_for_seconds(weekly_seconds)
     embed = discord.Embed(
         title=(
-            f"{target.display_name}'s C Timings"
+            f"{target.display_name} • {weekly_rank}'s C Timings"
             if MAIN_ID is not None and target.id == MAIN_ID
-            else f"{target.display_name}'s VC Timings"
+            else f"{target.display_name} • {weekly_rank}'s VC Timings"
         ),
         color=achievement_color(weekly_rank_index),
         timestamp=utc_now(),
@@ -1077,12 +1190,15 @@ async def profile(
     embed.add_field(name="Daily streak", value=f"🔥 {daily_streak} day(s)", inline=True)
     embed.add_field(
         name="Current weekly rank",
-        value=f"{weekly_rank}\n{weekly_seconds / 3600:.2f} hours",
+        value=weekly_rank,
         inline=True,
     )
     embed.add_field(name="Last session", value=last_session_text, inline=False)
     embed.add_field(name="Last 5 sessions", value=recent_text, inline=False)
-    embed.set_footer(text=f"Requested By {interaction.user.display_name}")
+    footer = f"Requested By {interaction.user.display_name}"
+    if guild_report:
+        footer += f" • {user_fact(guild_report, target.id, total_seconds)}"
+    embed.set_footer(text=footer)
     await interaction.response.send_message(
         embed=embed,
         view=ProfileView(
@@ -1146,17 +1262,17 @@ async def achievements(
     embed.set_thumbnail(url=target.display_avatar.url)
     embed.add_field(
         name="Weekly highest",
-        value=f"{weekly_rank}\n{weekly_seconds / 3600:.2f} hours",
+        value=weekly_rank,
         inline=True,
     )
     embed.add_field(
         name="Monthly highest",
-        value=f"{monthly_seconds / 3600:.2f} hours",
+        value=format_hours_minutes(monthly_seconds),
         inline=True,
     )
     embed.add_field(
         name="Daily",
-        value=f"{daily_seconds / 3600:.2f} hours\n🔥 {daily_streak} day streak",
+        value=f"{format_hours_minutes(daily_seconds)}\n🔥 {daily_streak} day streak",
         inline=True,
     )
     if milestones:
@@ -1176,8 +1292,53 @@ async def achievements(
             value="No 50-hour milestones reached yet.",
             inline=False,
         )
-    embed.set_footer(text=f"Requested By {interaction.user.display_name}")
+    embed.set_footer(
+        text=(
+            f"Requested By {interaction.user.display_name} • "
+            f"{user_fact(guild_report, target.id, user_total_seconds(guild_report, target.id))}"
+        )
+    )
     await interaction.response.send_message(embed=embed)
+
+
+@tree.command(
+    name="lobotomykaisen",
+    description="Browse the ranked voice-tracker meme gallery",
+)
+@app_commands.describe(user="The member whose rank should appear in the gallery title")
+async def lobotomykaisen(
+    interaction: discord.Interaction,
+    user: discord.Member | None = None,
+) -> None:
+    if interaction.guild is None:
+        await interaction.response.send_message(
+            "This command can only be used inside a server.", ephemeral=True
+        )
+        return
+    target = user or (
+        interaction.user
+        if isinstance(interaction.user, discord.Member)
+        else await interaction.guild.fetch_member(interaction.user.id)
+    )
+    guild_report = report["guilds"].get(str(interaction.guild.id))
+    weekly_seconds = (
+        weekly_seconds_for_user(guild_report, target.id, utc_now())
+        if guild_report
+        else 0
+    )
+    rank_index, rank = achievement_for_seconds(weekly_seconds)
+    try:
+        image_path = meme_path(1)
+    except FileNotFoundError as error:
+        await interaction.response.send_message(str(error), ephemeral=True)
+        return
+    file = discord.File(image_path, filename="meme-1.jpg")
+    view = MemeView(interaction.user.id, target, rank, rank_index)
+    await interaction.response.send_message(
+        embed=meme_embed(target, rank, rank_index, 1, interaction.user.display_name),
+        file=file,
+        view=view,
+    )
 
 
 @tree.command(name="recap", description="Show a user's weekly voice recap")
@@ -1198,9 +1359,14 @@ async def recap(interaction: discord.Interaction, user: discord.Member | None = 
     rank_index, rank = achievement_for_seconds(total)
     embed = discord.Embed(title=f"{target.display_name}'s Weekly Recap", color=achievement_color(rank_index), timestamp=now)
     embed.add_field(name="Total", value=format_duration(total), inline=True)
-    embed.add_field(name="Rank", value=f"{rank}\n{total / 3600:.2f} hours", inline=True)
+    embed.add_field(name="Rank", value=rank, inline=True)
     embed.add_field(name="Daily breakdown", value="\n".join(f"**{day:%a}** — {format_duration(seconds)}" for day, seconds in values), inline=False)
-    embed.set_footer(text=f"Requested By {interaction.user.display_name}")
+    embed.set_footer(
+        text=(
+            f"Requested By {interaction.user.display_name} • "
+            f"{user_fact(guild_report, target.id, total)}"
+        )
+    )
     await interaction.response.send_message(embed=embed, view=ProfileView(interaction.user.id, embed, guild_report, target))
 
 
@@ -1221,15 +1387,21 @@ async def progress(interaction: discord.Interaction, user: discord.Member | None
     _, upper, _ = ACHIEVEMENT_RANKS[rank_index]
     total = live_total_seconds(guild_report, target.id)
     milestone = next((hours for hours in MILESTONE_HOURS if total < hours * 3600), None)
-    weekly_value = f"{weekly / 3600:.2f} hours at **{rank}**"
+    weekly_value = f"**{rank}**"
     if upper is not None:
         weekly_value += f"\n{progress_bar(weekly, int(upper * 3600))}\n{format_duration(max(0, int(upper * 3600 - weekly)))} until **{ACHIEVEMENT_RANKS[rank_index + 1][2]}**"
-    overall_value = f"{total / 3600:.2f} total hours"
+    overall_value = f"{format_hours_minutes(total)} total"
     if milestone is not None:
         overall_value += f"\n{progress_bar(total, milestone * 3600)}\n{format_duration(max(0, milestone * 3600 - total))} until {milestone}-hour milestone"
     embed = discord.Embed(title=f"{target.display_name}'s Progress", color=achievement_color(rank_index), timestamp=now)
     embed.add_field(name="Weekly rank", value=weekly_value, inline=False)
     embed.add_field(name="Overall hours", value=overall_value, inline=False)
+    embed.set_footer(
+        text=(
+            f"Requested By {interaction.user.display_name} • "
+            f"{user_fact(guild_report, target.id, total)}"
+        )
+    )
     await interaction.response.send_message(embed=embed)
 
 
@@ -1412,6 +1584,34 @@ def channel_statistics(guild_id: int) -> list[dict[str, Any]]:
     return sorted(stats.values(), key=lambda item: item["seconds"], reverse=True)
 
 
+def museum_records(guild_report: dict[str, Any]) -> dict[str, Any]:
+    sessions: list[tuple[int, dict[str, Any]]] = []
+    channel_totals: dict[int, int] = {}
+    day_totals: dict[date, int] = {}
+    for user_id in guild_report.get("users", {}):
+        for user_report in iter_user_reports(guild_report, int(user_id)):
+            for session in user_report.get("sessions", []):
+                duration = int(session.get("duration_seconds", 0))
+                if duration <= 0:
+                    continue
+                member_id = int(user_id)
+                sessions.append((member_id, session))
+                channel_id = int(session.get("channel_id", 0))
+                channel_totals[channel_id] = channel_totals.get(channel_id, 0) + duration
+                session_day = parse_timestamp(session["joined_at"]).astimezone(IST).date()
+                day_totals[session_day] = day_totals.get(session_day, 0) + duration
+    user_totals = {
+        int(user_id): user_total_seconds(guild_report, int(user_id))
+        for user_id in guild_report.get("users", {})
+    }
+    return {
+        "longest_session": max(sessions, key=lambda item: int(item[1]["duration_seconds"]), default=None),
+        "top_user": max(user_totals.items(), key=lambda item: item[1], default=None),
+        "top_channel": max(channel_totals.items(), key=lambda item: item[1], default=None),
+        "peak_day": max(day_totals.items(), key=lambda item: item[1], default=None),
+    }
+
+
 def owner_only(interaction: discord.Interaction) -> bool:
     return MAIN_ID is not None and interaction.user.id == MAIN_ID
 
@@ -1517,6 +1717,67 @@ async def vcstats(interaction: discord.Interaction) -> None:
         color=rank_color_for_member(interaction.guild.id, interaction.user.id),
         timestamp=utc_now(),
     )
+    embed.set_footer(text=f"Requested By {interaction.user.display_name}")
+    await interaction.response.send_message(embed=embed)
+
+
+@tree.command(name="museum", description="Display the server's historical voice records")
+async def museum(interaction: discord.Interaction) -> None:
+    if interaction.guild is None:
+        await interaction.response.send_message(
+            "This command can only be used inside a server.", ephemeral=True
+        )
+        return
+    guild_report = report["guilds"].get(str(interaction.guild.id))
+    if not guild_report:
+        await interaction.response.send_message(
+            "No historical voice records are available yet.", ephemeral=True
+        )
+        return
+
+    records = museum_records(guild_report)
+    embed = discord.Embed(
+        title=f"{interaction.guild.name} Voice Museum",
+        description="A hall of the server's most historic VC records.",
+        color=rank_color_for_member(interaction.guild.id, interaction.user.id),
+        timestamp=utc_now(),
+    )
+    longest = records["longest_session"]
+    if longest:
+        member_id, session = longest
+        member = interaction.guild.get_member(member_id)
+        embed.add_field(
+            name="🏛️ Longest single session",
+            value=(
+                f"{member.display_name if member else session.get('user_name', member_id)} — "
+                f"{format_duration(int(session['duration_seconds']))}\n"
+                f"{session.get('channel_name', 'Unknown VC')}"
+            ),
+            inline=False,
+        )
+    top_user = records["top_user"]
+    if top_user:
+        member = interaction.guild.get_member(top_user[0])
+        embed.add_field(
+            name="👑 Most total VC time",
+            value=f"{member.display_name if member else top_user[0]} — {format_duration(top_user[1])}",
+            inline=True,
+        )
+    top_channel = records["top_channel"]
+    if top_channel:
+        channel = interaction.guild.get_channel(top_channel[0])
+        embed.add_field(
+            name="🔥 Busiest voice channel",
+            value=f"{channel.name if channel else top_channel[0]} — {format_duration(top_channel[1])}",
+            inline=True,
+        )
+    peak_day = records["peak_day"]
+    if peak_day:
+        embed.add_field(
+            name="📅 Peak activity day",
+            value=f"{peak_day[0].strftime('%d %b %Y')} — {format_duration(peak_day[1])}",
+            inline=True,
+        )
     embed.set_footer(text=f"Requested By {interaction.user.display_name}")
     await interaction.response.send_message(embed=embed)
 
@@ -1768,7 +2029,7 @@ async def cprofile(interaction: discord.Interaction) -> None:
     embed.add_field(name="Times in VC", value=str(len(sessions) + int(active_is_specific)), inline=True)
     embed.add_field(
         name="Current weekly rank",
-        value=f"{cprofile_rank}\n{cprofile_weekly_seconds / 3600:.2f} hours",
+        value=cprofile_rank,
         inline=True,
     )
     embed.add_field(name="Last session", value=last_session_text, inline=False)
