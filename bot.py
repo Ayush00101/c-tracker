@@ -702,8 +702,7 @@ def boss_name(now: datetime, participant_count: int) -> str:
         "The AFK Archdemon",
     )
     return (
-        f"{random.choice(names)} of {now.astimezone(IST):%H%M} "
-        f"({participant_count} challengers)"
+        f"{random.choice(names)} of {now.astimezone(IST):%H%M}"
     )
 
 
@@ -736,7 +735,11 @@ def boss_current_health(boss: dict[str, Any], now: datetime) -> tuple[int, dict[
     poison_damage = int(hp_points * 0.0003 * poison_seconds)
     regeneration = 0
     for effect in boss.get("effects", []):
-        if effect["type"] == "luck_splash" and parse_timestamp(effect["started_at"]) <= now:
+        if (
+            effect["type"] == "luck_splash"
+            and effect.get("boss_regenerates")
+            and parse_timestamp(effect["started_at"]) <= now
+        ):
             end = min(now, parse_timestamp(effect["expires_at"]))
             regeneration += int(hp_points * 0.01 * max(0, int((end - parse_timestamp(effect["started_at"])).total_seconds() // 60)))
     health = max(0, hp_points - sum(damage.values()) - poison_damage + regeneration)
@@ -2904,17 +2907,39 @@ def boss_status_embed(
     participant_ids = list(boss.get("participants", {}))
     page_count = max(1, (len(participant_ids) + 3) // 4)
     page = max(0, min(page, page_count - 1))
+    boss_effects = []
+    for effect in boss.get("effects", []):
+        if parse_timestamp(effect["expires_at"]) <= utc_now():
+            continue
+        boss_effect = effect.get("boss_effect")
+        if boss_effect is None:
+            boss_effect = {
+                "poison_splash": "Poisoned",
+                "strength_splash": "Strength effect",
+                "luck_splash": "Luck effect",
+                "invisibility_splash": "Invisibility effect",
+                "awkward_splash": "Awkward boast only",
+            }.get(effect.get("type"), "Active boss effect")
+        boss_effects.append(boss_effect)
+    deadline_seconds = max(
+        0,
+        int((parse_timestamp(boss["expires_at"]) - utc_now()).total_seconds()),
+    )
     embed = discord.Embed(
         title=f"👹 {boss['name']} — Battle Stats",
-        description=(
-            f"**Boss:** {boss['name']}\n"
-            f"**Base health:** {boss_hp_points(boss):,} HP\n"
-            f"**Current health:** {health:,} HP\n"
-            f"**Damage dealt:** {max(0, boss_hp_points(boss) - health):,} HP\n"
-            f"**Deadline:** <t:{int(parse_timestamp(boss['expires_at']).timestamp())}:R>"
-        ),
+        description=f"**Deadline:** {format_duration(deadline_seconds)} remaining",
         color=discord.Color.dark_red(),
         timestamp=utc_now(),
+    )
+    embed.add_field(
+        name="👹 Boss status",
+        value=(
+            f"**Health:** `{health:,} / {boss_hp_points(boss):,} HP`\n"
+            f"**Damage dealt:** `{max(0, boss_hp_points(boss) - health):,} HP`\n"
+            f"**Time remaining:** `{format_duration(deadline_seconds)}`\n"
+            f"**Effects:** {', '.join(boss_effects) or 'None'}"
+        ),
+        inline=False,
     )
     for member_id in participant_ids[page * 4 : (page + 1) * 4]:
         participant = boss["participants"][member_id]
@@ -2934,7 +2959,7 @@ def boss_status_embed(
             ),
             inline=True,
         )
-    footer = f"Player page {page + 1}/{page_count} • Boss stats always shown first"
+    footer = f"Player page {page + 1}/{page_count}"
     if requested_by:
         footer += f" • Requested By {requested_by}"
     embed.set_footer(text=footer)
@@ -2982,6 +3007,93 @@ class BossStatusView(discord.ui.View):
     async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         self.page += 1
         await self.render(interaction)
+
+
+class BossEndView(discord.ui.View):
+    def __init__(
+        self,
+        requester_id: int,
+        guild_report: dict[str, Any],
+        boss: dict[str, Any],
+        channel: discord.abc.Messageable,
+    ) -> None:
+        super().__init__(timeout=60)
+        self.requester_id = requester_id
+        self.guild_report = guild_report
+        self.boss = boss
+        self.channel = channel
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.requester_id:
+            await interaction.response.send_message(
+                embed=message_embed(
+                    "Only the bot owner can confirm ending this battle.",
+                    title="Boss battle control",
+                ),
+                ephemeral=True,
+            )
+            return False
+        return True
+
+    @discord.ui.button(label="End battle", style=discord.ButtonStyle.danger)
+    async def confirm(
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button,
+    ) -> None:
+        if self.boss.get("status") != "active":
+            self.stop()
+            await interaction.response.edit_message(
+                embed=message_embed(
+                    "This boss battle is no longer active.",
+                    title="Boss battle already ended",
+                ),
+                view=None,
+            )
+            return
+        self.boss["status"] = "ended_by_owner"
+        self.boss["ended_at"] = isoformat(utc_now())
+        self.boss["ended_by"] = interaction.user.id
+        save_report()
+        self.stop()
+        await interaction.response.edit_message(
+            embed=message_embed(
+                f"✅ **{self.boss['name']}** has been ended permanently.",
+                title="Boss battle ended",
+                color=discord.Color.red(),
+            ),
+            view=None,
+        )
+        public_embed = discord.Embed(
+            title="🛑 Boss battle ended",
+            description=(
+                f"**{self.boss['name']}** was ended by the server owner.\n"
+                "The battle will no longer deal damage, send alerts, or accept "
+                "powerups."
+            ),
+            color=discord.Color.red(),
+            timestamp=utc_now(),
+        )
+        public_embed.set_footer(text=f"Requested By {interaction.user.display_name}")
+        try:
+            await self.channel.send(embed=public_embed)
+        except (discord.Forbidden, discord.HTTPException):
+            return
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.secondary)
+    async def cancel(
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button,
+    ) -> None:
+        self.stop()
+        await interaction.response.edit_message(
+            embed=message_embed(
+                "The boss battle is still active. No changes were made.",
+                title="Boss battle preserved",
+            ),
+            view=None,
+        )
 
 
 def channel_detail_statistics(
@@ -3369,6 +3481,7 @@ def activate_boss_powerup(
         effect["weakened_members"] = (
             active_members if random.random() < 0.15 else []
         )
+        effect["boss_effect"] = "Poisoned: loses 0.03% max HP every 10 seconds"
         effect["activation_message"] = "☠️ Poison is active for 10 minutes."
         return effect
     if powerup_key == "strength_splash":
@@ -3379,15 +3492,30 @@ def activate_boss_powerup(
             )
             boss["hp_points"] = int(boss_hp_points(boss) * (1.10 + uses * 0.05))
             effect["boss_strengthened"] = True
+        effect["boss_effect"] = (
+            "Strengthened: may gain 10% max HP (plus 5% per repeated proc)"
+            if effect.get("boss_strengthened")
+            else "No boss strength proc"
+        )
         effect["activation_message"] = "💪 Strength is active for 5 minutes."
         return effect
     if powerup_key == "luck_splash":
         effect["boss_regenerates"] = random.random() < 0.10
+        effect["boss_effect"] = (
+            "Regenerating: gains 1% max HP per minute for 10 minutes"
+            if effect["boss_regenerates"]
+            else "No boss regeneration proc"
+        )
         effect["activation_message"] = "🍀 Luck is active for 10 minutes."
         return effect
     if powerup_key == "invisibility_splash":
         effect["current_members"] = active_members
         effect["boss_harder"] = random.random() < 0.10
+        effect["boss_effect"] = (
+            "Hardened: has a 25% chance to miss each calculated hit"
+            if effect["boss_harder"]
+            else "No boss hardening proc"
+        )
         effect["activation_message"] = "🫥 Invisibility is active for 10 minutes."
         return effect
     effect["boast"] = (
@@ -3396,6 +3524,7 @@ def activate_boss_powerup(
         else f"**{boss['name']}**'s stats are immensely increased!"
     )
     effect["activation_message"] = f"😬 Awkward effect: {effect['boast']}"
+    effect["boss_effect"] = "Awkward boast only: no mechanical boss effect"
     return effect
 
 
@@ -3542,6 +3671,58 @@ async def bossbattle(
     await interaction.response.send_message(embed=embed)
     monitor_task = asyncio.create_task(monitor_boss(interaction.guild.id))
     boss_monitor_tasks[interaction.guild.id] = monitor_task
+
+
+@tree.command(name="endboss", description="Owner-only: permanently end the active boss battle")
+async def endboss(interaction: discord.Interaction) -> None:
+    if interaction.guild is None:
+        await interaction.response.send_message(
+            embed=message_embed(
+                "This command can only be used inside a server.",
+                title="Server only",
+            )
+        )
+        return
+    if not owner_only(interaction):
+        await interaction.response.send_message(
+            embed=message_embed(
+                "Only the bot owner can permanently end a boss battle.",
+                title="Owner only",
+            ),
+            ephemeral=True,
+        )
+        return
+    guild_report = report["guilds"].get(str(interaction.guild.id))
+    boss = guild_report.get("boss_battle") if guild_report else None
+    if not boss or boss.get("status") != "active":
+        await interaction.response.send_message(
+            embed=message_embed(
+                "There is no active boss battle to end.",
+                title="No active boss battle",
+            )
+        )
+        return
+    confirmation = discord.Embed(
+        title="⚠️ End boss battle?",
+        description=(
+            f"Are you sure you want to permanently end **{boss['name']}**?\n\n"
+            "This stops damage tracking, alerts, powerup use, and the 24-hour "
+            "battle. This action cannot be undone."
+        ),
+        color=discord.Color.orange(),
+        timestamp=utc_now(),
+    )
+    confirmation.set_footer(text=f"Requested By {interaction.user.display_name}")
+    await interaction.response.send_message(
+        embed=confirmation,
+        view=BossEndView(
+            interaction.user.id,
+            guild_report,
+            boss,
+            interaction.channel,
+        ),
+        ephemeral=True,
+    )
 
 
 @tree.command(name="vcstats", description="Show the voice-channel leaderboard")
