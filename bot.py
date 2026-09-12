@@ -75,7 +75,14 @@ def message_embed(
     title: str = "Voice Tracker",
     color: discord.Color = discord.Color.blurple(),
 ) -> discord.Embed:
-    return discord.Embed(title=title, description=description, color=color, timestamp=utc_now())
+    embed = discord.Embed(
+        title=title,
+        description=description,
+        color=color,
+        timestamp=utc_now(),
+    )
+    embed.set_footer(text="Requested By the command user")
+    return embed
 
 
 def isoformat(value: datetime) -> str:
@@ -216,6 +223,58 @@ def quest_complete(user_quest: dict[str, Any], member: discord.Member) -> bool:
                 for session in report_part.get("sessions", [])
             )
         return seconds >= int(user_quest.get("target", 0)) * 60
+
+
+async def announce_quest_ready(member: discord.Member) -> None:
+    guild_report = report.get("guilds", {}).get(str(member.guild.id))
+    user_record = (guild_report or {}).get("users", {}).get(str(member.id))
+    user_quest = (user_record or {}).get("quest")
+    if not guild_report or not user_record or not user_quest:
+        return
+    today = utc_now().astimezone(IST).date().isoformat()
+    if (
+        user_quest.get("day") != today
+        or user_quest.get("completed")
+        or user_quest.get("claimable")
+    ):
+        return
+    channel = getattr(member.voice, "channel", None)
+    is_join_objective = (
+        user_quest.get("kind") == "join_channel"
+        and channel is not None
+        and channel.name == user_quest.get("channel")
+    )
+    if not is_join_objective and not quest_complete(user_quest, member):
+        return
+    user_quest["claimable"] = True
+    save_report()
+    channel_id = user_quest.get("channel_id")
+    destination = (
+        member.guild.get_channel(int(channel_id))
+        if channel_id
+        else None
+    )
+    if destination is None:
+        destination = member.guild.system_channel
+    if destination is None or not hasattr(destination, "send"):
+        return
+    embed = discord.Embed(
+        title="🎁 Quest ready to claim",
+        description=(
+            f"{member.mention} completed today's quest!\n\n"
+            "Use `/quest` again to claim your boss-battle powerup."
+        ),
+        color=discord.Color.green(),
+        timestamp=utc_now(),
+    )
+    embed.add_field(name="Completed objective", value=user_quest["text"], inline=False)
+    embed.set_footer(
+        text=f"Requested By {user_quest.get('requested_by', member.display_name)}"
+    )
+    try:
+        await destination.send(embed=embed)
+    except (discord.Forbidden, discord.HTTPException):
+        return
 def roulette_effect_for(guild_id: int, member_id: int) -> dict[str, Any] | None:
     key = (guild_id, member_id)
     effect = active_roulette_effects.get(key)
@@ -1534,6 +1593,7 @@ def duel_scoreboard_embed(
         color=color,
         timestamp=utc_now(),
     )
+    embed.set_footer(text=f"Requested By {challenger.display_name}")
     return embed
 
 
@@ -1888,6 +1948,9 @@ async def on_voice_state_update(
         if not resume_recent_session(member, after.channel, joined_at):
             start_session(member, after.channel)
         enroll_boss_player(member)
+        await announce_quest_ready(member)
+    elif was_tracked and not is_now_tracked:
+        await announce_quest_ready(member)
 
 
 @tree.command(name="profile", description="Show a user's voice channel activity profile")
@@ -2100,7 +2163,12 @@ async def roulette(interaction: discord.Interaction) -> None:
     )
     embed.add_field(name="Temporary role", value=f"**{outcome['role']}**", inline=True)
     embed.add_field(name="Temporary stat change", value=outcome["stat"], inline=True)
-    embed.set_footer(text="This effect lasts 2 hours and then returns to normal.")
+    embed.set_footer(
+        text=(
+            f"This effect lasts 2 hours and then returns to normal. • "
+            f"Requested By {interaction.user.display_name}"
+        )
+    )
     await interaction.response.send_message(embed=embed)
 
 
@@ -2571,7 +2639,12 @@ async def timecapsule(interaction: discord.Interaction, week: str | None = None,
     embed.add_field(name="Users", value=lines(users, "users"), inline=False)
     embed.add_field(name="Channels", value=lines(channels, "channels"), inline=False)
     if comparison:
-        embed.set_footer(text=f"Compared with {compare_week} • Deltas use + / -")
+        embed.set_footer(
+            text=(
+                f"Compared with {compare_week} • Deltas use + / - • "
+                f"Requested By {interaction.user.display_name}"
+            )
+        )
     await interaction.response.send_message(embed=embed)
 
 
@@ -2821,7 +2894,12 @@ class HistoryView(discord.ui.View):
         await self.render(interaction)
 
 
-def boss_status_embed(guild: discord.Guild, boss: dict[str, Any], page: int = 0) -> discord.Embed:
+def boss_status_embed(
+    guild: discord.Guild,
+    boss: dict[str, Any],
+    page: int = 0,
+    requested_by: str | None = None,
+) -> discord.Embed:
     health, damage = boss_current_health(boss, utc_now())
     participant_ids = list(boss.get("participants", {}))
     page_count = max(1, (len(participant_ids) + 3) // 4)
@@ -2856,7 +2934,10 @@ def boss_status_embed(guild: discord.Guild, boss: dict[str, Any], page: int = 0)
             ),
             inline=True,
         )
-    embed.set_footer(text=f"Player page {page + 1}/{page_count} • Boss stats always shown first")
+    footer = f"Player page {page + 1}/{page_count} • Boss stats always shown first"
+    if requested_by:
+        footer += f" • Requested By {requested_by}"
+    embed.set_footer(text=footer)
     return embed
 
 
@@ -2883,7 +2964,12 @@ class BossStatusView(discord.ui.View):
         self.previous_button.disabled = self.page <= 0
         self.next_button.disabled = self.page >= self.page_count - 1
         await interaction.response.edit_message(
-            embed=boss_status_embed(self.guild, self.boss, self.page),
+            embed=boss_status_embed(
+                self.guild,
+                self.boss,
+                self.page,
+                interaction.user.display_name,
+            ),
             view=self,
         )
 
@@ -3126,38 +3212,47 @@ async def quest(interaction: discord.Interaction, answer: str | None = None) -> 
     today = utc_now().astimezone(IST).date().isoformat()
     current = user_record.get("quest")
     if current and current.get("day") == today:
-        if current.get("kind") == "wordle" and answer:
-            complete = answer.strip().lower() == current["answer"]
+        if not current.get("channel_id"):
+            current["channel_id"] = interaction.channel_id
+            current["requested_by"] = interaction.user.display_name
+            save_report()
+        if current.get("completed"):
+            status = "✅ claimed"
+        elif current.get("kind") == "wordle" and answer:
+            current["claimable"] = answer.strip().lower() == current["answer"]
+            status = "✅ ready to claim" if current["claimable"] else "❌ answer not correct"
         else:
-            complete = quest_complete(current, member)
-        if complete and not current.get("completed"):
+            await announce_quest_ready(member)
+            status = "✅ ready to claim" if current.get("claimable") else "⏳ in progress"
+        if current.get("claimable") and not current.get("completed"):
             current["completed"] = True
+            current["claimable"] = False
             user_record["quests_completed"] = int(user_record.get("quests_completed", 0)) + 1
             reward = random.choice(tuple(POWERUPS))
             user_record.setdefault("powerups", []).append(reward)
             save_report()
-            await interaction.response.send_message(
-                embed=message_embed(
+            claim_embed = message_embed(
                     f"✅ Quest complete! You received **{POWERUPS[reward]['name']}**.\n"
                     f"Use `/powerups` to inspect it; powerups can only affect boss battles.",
                     title="Quest complete",
                 )
-            )
+            claim_embed.set_footer(text=f"Requested By {interaction.user.display_name}")
+            await interaction.response.send_message(embed=claim_embed)
             return
-        status = "✅ completed" if current.get("completed") else "⏳ in progress"
+        status = "✅ claimed" if current.get("completed") else status
         extra = (
             " Submit the Wordle answer with `/quest answer:<word>`."
             if current.get("kind") == "wordle"
             else ""
         )
         hint = current.get("hint", "Follow the objective above before the end of today.")
-        await interaction.response.send_message(
-            embed=message_embed(
+        quest_status_embed = message_embed(
                 f"Your quest is **{status}**:\n\n{current['text']}{extra}\n\n"
                 f"**Hint:** {hint}",
                 title="Today's quest",
             )
-        )
+        quest_status_embed.set_footer(text=f"Requested By {interaction.user.display_name}")
+        await interaction.response.send_message(embed=quest_status_embed)
         return
     if current and current.get("day") != today:
         user_record["quest"] = None
@@ -3186,18 +3281,21 @@ async def quest(interaction: discord.Interaction, answer: str | None = None) -> 
             "day": today,
             "assigned_at": isoformat(utc_now()),
             "completed": False,
+            "claimable": False,
+            "channel_id": interaction.channel_id,
+            "requested_by": interaction.user.display_name,
         }
     )
     user_record["quest"] = quest_data
     save_report()
-    await interaction.response.send_message(
-        embed=message_embed(
+    quest_embed = message_embed(
             f"🗺️ {quest_data['text']}\n\n"
             f"**Hint:** {quest_data['hint']}\n\n"
             "You can receive one quest per day.",
             title="Daily quest assigned",
         )
-    )
+    quest_embed.set_footer(text=f"Requested By {interaction.user.display_name}")
+    await interaction.response.send_message(embed=quest_embed)
 
 
 @tree.command(name="powerups", description="View your boss battle powerups")
@@ -3231,7 +3329,12 @@ async def powerups(interaction: discord.Interaction) -> None:
         color=rank_color_for_member(interaction.guild.id, interaction.user.id),
         timestamp=utc_now(),
     )
-    embed.set_footer(text="Powerups can only be used during an active /bossbattle.")
+    embed.set_footer(
+        text=(
+            "Powerups can only be used during an active /bossbattle. • "
+            f"Requested By {interaction.user.display_name}"
+        )
+    )
     await interaction.response.send_message(embed=embed)
 
 
@@ -3339,7 +3442,11 @@ async def bossbattle(
             existing.setdefault("effects", []).append(effect)
             save_report()
             view = BossStatusView(interaction.user.id, interaction.guild, existing)
-            status_embed = boss_status_embed(interaction.guild, existing)
+            status_embed = boss_status_embed(
+                interaction.guild,
+                existing,
+                requested_by=interaction.user.display_name,
+            )
             status_embed.add_field(
                 name="Potion activated",
                 value=f"🧪 **{POWERUPS[powerup.value]['name']}** used.\n{effect['activation_message']}",
@@ -3352,7 +3459,11 @@ async def bossbattle(
             return
         view = BossStatusView(interaction.user.id, interaction.guild, existing)
         await interaction.response.send_message(
-            embed=boss_status_embed(interaction.guild, existing),
+            embed=boss_status_embed(
+                interaction.guild,
+                existing,
+                requested_by=interaction.user.display_name,
+            ),
             view=view,
         )
         return
@@ -3427,6 +3538,7 @@ async def bossbattle(
         color=discord.Color.dark_red(),
         timestamp=now,
     )
+    embed.set_footer(text=f"Requested By {interaction.user.display_name}")
     await interaction.response.send_message(embed=embed)
     monitor_task = asyncio.create_task(monitor_boss(interaction.guild.id))
     boss_monitor_tasks[interaction.guild.id] = monitor_task
@@ -3867,6 +3979,7 @@ async def duel(
         color=color,
         timestamp=utc_now(),
     )
+    intro.set_footer(text=f"Requested By {interaction.user.display_name}")
     active_duel_users.add(challenger.id)
     active_duel_users.add(user.id)
     try:
@@ -3883,6 +3996,7 @@ async def duel(
                 color=color,
                 timestamp=utc_now(),
             )
+            countdown.set_footer(text=f"Requested By {interaction.user.display_name}")
             await edit_message_safe(message, embed=countdown)
             await asyncio.sleep(1)
         view = DuelWeekView(challenger.id, user.id)
@@ -3896,6 +4010,7 @@ async def duel(
             color=color,
             timestamp=utc_now(),
         )
+        choice_embed.set_footer(text=f"Requested By {interaction.user.display_name}")
         await edit_message_safe(message, embed=choice_embed, view=view)
         try:
             await asyncio.wait_for(view.finished.wait(), timeout=46)
@@ -3917,6 +4032,7 @@ async def duel(
             color=color,
             timestamp=utc_now(),
         )
+        lock_embed.set_footer(text=f"Requested By {interaction.user.display_name}")
         await edit_message_safe(message, embed=lock_embed, view=view)
         await asyncio.sleep(2)
         guild_report = report["guilds"].get(str(interaction.guild.id))

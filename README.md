@@ -88,6 +88,9 @@ Additional commands include:
 - `/quest` for one daily quest from exactly 50 voice-channel-based quests.
   The public quest embed includes a practical hint explaining how to complete
   the objective; 10% of assignments ask for the hidden daily Wordle answer.
+  The quest message channel is remembered, and completing a voice objective
+  posts a public ready-to-claim embed there. Run `/quest` again to claim the
+  powerup.
 - `/powerups` to view earned boss-only powerups in a public embed.
 - `/museum` for historical server records and notable VC achievements
 - `/lobotomykaisen` for the ranked eight-page meme gallery with emoji navigation

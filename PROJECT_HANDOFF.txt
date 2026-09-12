@@ -154,7 +154,9 @@ Current slash commands
   quests. The public quest embed includes a practical hint explaining what
   action completes the objective. Ten percent of assignments are Wordle-answer
   quests using a deterministic daily answer source, with a submission hint.
-  Completing a quest awards one boss-only powerup.
+  Voice completion is detected from voice-state updates and announced in the
+  channel where the quest was assigned. The user runs `/quest` again to claim
+  one boss-only powerup; assignment and claim embeds include a requester footer.
 
 /powerups
   Shows the invoking user's boss-only powerup inventory in a public embed.
