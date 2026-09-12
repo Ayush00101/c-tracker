@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-12T17:47:30.180158+00:00",
+  "generated_at": "2026-09-12T18:30:46.933718+00:00",
   "guilds": {
     "1401597431522787481": {
       "guild_name": "backchodi ka kila",
@@ -68,7 +68,7 @@
             ]
           },
           "other": {
-            "total_seconds": 5866,
+            "total_seconds": 6254,
             "sessions": [
               {
                 "channel_id": 1524635681522061332,
@@ -83,6 +83,13 @@
                 "joined_at": "2026-09-12T10:12:19.891566+00:00",
                 "left_at": "2026-09-12T11:27:08.191953+00:00",
                 "duration_seconds": 4488
+              },
+              {
+                "channel_id": 1524635681522061332,
+                "channel_name": "Ameeron Ka VC",
+                "joined_at": "2026-09-12T17:55:35.228198+00:00",
+                "left_at": "2026-09-12T18:02:03.367589+00:00",
+                "duration_seconds": 388
               }
             ]
           },
@@ -95,7 +102,7 @@
         },
         "692792854501916742": {
           "user_name": "AyuZen",
-          "total_seconds": 50000,
+          "total_seconds": 51398,
           "sessions": [
             {
               "channel_id": 1545821919381561444,
@@ -194,6 +201,13 @@
               "joined_at": "2026-09-12T10:12:21.251920+00:00",
               "left_at": "2026-09-12T11:53:38.511830+00:00",
               "duration_seconds": 6077
+            },
+            {
+              "channel_id": 1524635681522061332,
+              "channel_name": "Ameeron Ka VC",
+              "joined_at": "2026-09-12T17:54:46.295677+00:00",
+              "left_at": "2026-09-12T18:18:04.457753+00:00",
+              "duration_seconds": 1398
             }
           ],
           "daily_streak": 6,
@@ -206,7 +220,7 @@
         },
         "1401979293608706141": {
           "user_name": "Halo alkane",
-          "total_seconds": 19253,
+          "total_seconds": 20665,
           "sessions": [
             {
               "channel_id": 1524635681522061332,
@@ -256,6 +270,13 @@
               "joined_at": "2026-09-12T10:12:22.609651+00:00",
               "left_at": "2026-09-12T11:52:48.882137+00:00",
               "duration_seconds": 6026
+            },
+            {
+              "channel_id": 1524635681522061332,
+              "channel_name": "Ameeron Ka VC",
+              "joined_at": "2026-09-12T17:54:46.295687+00:00",
+              "left_at": "2026-09-12T18:18:18.438442+00:00",
+              "duration_seconds": 1412
             }
           ],
           "daily_streak": 1,
@@ -296,26 +317,7 @@
   },
   "cprofile_users": [],
   "weekly_state": {
-    "period_start": "2026-09-05T18:30:00+00:00",
-    "users": {
-      "1401979293608706141": {
-        "rank_index": 1,
-        "notified_rank_index": 1,
-        "label": "Tip Of Dihh",
-        "weekly_seconds": 20669
-      },
-      "692792854501916742": {
-        "rank_index": 2,
-        "notified_rank_index": 2,
-        "label": "C ka Bacha Hai Tu",
-        "weekly_seconds": 51963
-      },
-      "779287782928547880": {
-        "rank_index": 2,
-        "notified_rank_index": 2,
-        "label": "C ka Bacha Hai Tu",
-        "weekly_seconds": 41638
-      }
-    }
+    "period_start": "2026-09-12T18:30:00+00:00",
+    "users": {}
   }
 }
