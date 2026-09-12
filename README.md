@@ -46,3 +46,49 @@ session.
 
 Visits shorter than 5 minutes are ignored and are not saved or counted as
 sessions.
+
+Users who move between voice channels within 10 minutes keep one continuous
+session. Bot accounts are ignored. The `/current` command shows the non-bot
+users currently connected to each voice channel in the server.
+
+Additional commands include:
+
+- `/leaderboard` with daily, weekly, or monthly periods
+- `/recap` for a user's weekly voice summary and daily breakdown
+- `/timecapsule` for a historical weekly snapshot or two-week comparison
+- `/progress` for progress toward the next weekly rank and overall milestone
+- `/goal` to set a daily, weekly, or monthly voice-time goal
+- `/achievements` with weekly, monthly, daily, streak, and 50-hour milestones
+- `/vcstats` for voice-channel rankings
+- `/history` for the owner's paginated channel history
+- `/csv` for an owner-only CSV export sent by DM
+
+Weekly achievement ranks reset every Sunday at midnight IST. Users receive
+rank-up notifications and a weekly summary by DM. User statistics commands
+include a button to switch between the normal stats embed and a weekly
+activity graph.
+
+`/timecapsule` accepts week dates in `YYYY-MM-DD` format. It provides overview,
+user, channel, and highest-used-channel graph pages. Supplying a second week
+shows GitHub-style `+`/`-` differences against that comparison week.
+
+## Fun fact bank
+
+[fun_facts.py](./fun_facts.py) contains an offline, template-driven bank of
+1,000 profile facts. It generates different numeric combinations from the
+user's tracked time and avoids recently shown fact IDs when callers provide a
+recent-ID set.
+
+Current category counts:
+
+- Dank: 250
+- Dark: 200
+- Adult humor: 150
+- History: 80
+- Gaming: 70
+- Productivity: 70
+- Food: 60
+- Sleep: 60
+- Programming: 60
+
+Use `choose_fact(total_seconds, recent_ids=...)` to select and render a fact.

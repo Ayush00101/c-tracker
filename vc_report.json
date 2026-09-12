@@ -1,0 +1,272 @@
+{
+  "generated_at": "2026-09-12T11:53:38.511865+00:00",
+  "guilds": {
+    "1401597431522787481": {
+      "guild_name": "backchodi ka kila",
+      "users": {
+        "779287782928547880": {
+          "user_name": "Ayushwa",
+          "specific": {
+            "total_seconds": 33781,
+            "sessions": [
+              {
+                "channel_id": 1545821919381561444,
+                "channel_name": "C Programming Ka Gullam",
+                "joined_at": "2026-09-06T14:43:33.844230+00:00",
+                "left_at": "2026-09-06T14:49:35.293507+00:00",
+                "duration_seconds": 361
+              },
+              {
+                "channel_id": 1545821919381561444,
+                "channel_name": "C Programming Ka Gullam",
+                "joined_at": "2026-09-07T16:46:50.273363+00:00",
+                "left_at": "2026-09-07T17:18:30.402434+00:00",
+                "duration_seconds": 1900
+              },
+              {
+                "channel_id": 1545821919381561444,
+                "channel_name": "C Programming Ka Gullam",
+                "joined_at": "2026-09-08T16:35:42.327656+00:00",
+                "left_at": "2026-09-08T17:41:11.420142+00:00",
+                "duration_seconds": 3929
+              },
+              {
+                "channel_id": 1545821919381561444,
+                "channel_name": "C Programming Ka Gullam",
+                "joined_at": "2026-09-09T09:08:50.745341+00:00",
+                "left_at": "2026-09-09T09:51:47.335850+00:00",
+                "duration_seconds": 2576
+              },
+              {
+                "channel_id": 1545821919381561444,
+                "channel_name": "C Programming Ka Gullam",
+                "joined_at": "2026-09-09T16:53:06.335855+00:00",
+                "left_at": "2026-09-09T17:58:25.687699+00:00",
+                "duration_seconds": 3919
+              },
+              {
+                "channel_id": 1545821919381561444,
+                "channel_name": "C Programming Ka Gullam",
+                "joined_at": "2026-09-10T17:45:13.930285+00:00",
+                "left_at": "2026-09-10T19:33:08.555693+00:00",
+                "duration_seconds": 6474
+              },
+              {
+                "channel_id": 1545821919381561444,
+                "channel_name": "C Programming Ka Gullam",
+                "joined_at": "2026-09-11T15:36:08.029356+00:00",
+                "left_at": "2026-09-11T18:39:16.705966+00:00",
+                "duration_seconds": 10988
+              },
+              {
+                "channel_id": 1545821919381561444,
+                "channel_name": "C Programming Ka Gullam",
+                "joined_at": "2026-09-12T09:11:45.132289+00:00",
+                "left_at": "2026-09-12T10:12:19.890508+00:00",
+                "duration_seconds": 3634
+              }
+            ]
+          },
+          "other": {
+            "total_seconds": 5866,
+            "sessions": [
+              {
+                "channel_id": 1524635681522061332,
+                "channel_name": "Ameeron Ka VC",
+                "joined_at": "2026-09-07T17:23:12.279125+00:00",
+                "left_at": "2026-09-07T17:46:10.976576+00:00",
+                "duration_seconds": 1378
+              },
+              {
+                "channel_id": 1524635681522061332,
+                "channel_name": "Ameeron Ka VC",
+                "joined_at": "2026-09-12T10:12:19.891566+00:00",
+                "left_at": "2026-09-12T11:27:08.191953+00:00",
+                "duration_seconds": 4488
+              }
+            ]
+          }
+        },
+        "692792854501916742": {
+          "user_name": "AyuZen",
+          "total_seconds": 50000,
+          "sessions": [
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-07T16:37:26.309168+00:00",
+              "left_at": "2026-09-07T17:18:32.480945+00:00",
+              "duration_seconds": 2466
+            },
+            {
+              "channel_id": 1524635681522061332,
+              "channel_name": "Ameeron Ka VC",
+              "joined_at": "2026-09-07T17:18:32.481555+00:00",
+              "left_at": "2026-09-07T18:13:36.128001+00:00",
+              "duration_seconds": 3303
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-08T07:12:00.062553+00:00",
+              "left_at": "2026-09-08T07:46:59.195975+00:00",
+              "duration_seconds": 2099
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-08T13:07:06.926749+00:00",
+              "left_at": "2026-09-08T13:40:14.116469+00:00",
+              "duration_seconds": 1987
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-08T16:14:14.743331+00:00",
+              "left_at": "2026-09-08T18:08:16.270702+00:00",
+              "duration_seconds": 6841
+            },
+            {
+              "channel_id": 1401597433057771615,
+              "channel_name": "General",
+              "joined_at": "2026-09-08T19:04:00.270259+00:00",
+              "left_at": "2026-09-08T19:43:34.598127+00:00",
+              "duration_seconds": 2374
+            },
+            {
+              "channel_id": 1524635681522061332,
+              "channel_name": "Ameeron Ka VC",
+              "joined_at": "2026-09-09T19:03:41.111157+00:00",
+              "left_at": "2026-09-09T19:42:41.575367+00:00",
+              "duration_seconds": 2340
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-10T07:00:30.580790+00:00",
+              "left_at": "2026-09-10T07:40:39.117221+00:00",
+              "duration_seconds": 2408
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-10T17:46:36.891524+00:00",
+              "left_at": "2026-09-10T18:09:26.521488+00:00",
+              "duration_seconds": 1369
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-10T18:35:34.900959+00:00",
+              "left_at": "2026-09-10T19:16:21.566474+00:00",
+              "duration_seconds": 2446
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-11T15:51:45.774585+00:00",
+              "left_at": "2026-09-11T18:40:04.107558+00:00",
+              "duration_seconds": 10098
+            },
+            {
+              "channel_id": 1524635681522061332,
+              "channel_name": "Ameeron Ka VC",
+              "joined_at": "2026-09-11T18:47:10.047216+00:00",
+              "left_at": "2026-09-11T19:56:31.951540+00:00",
+              "duration_seconds": 4161
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-12T09:38:29.909574+00:00",
+              "left_at": "2026-09-12T10:12:21.250872+00:00",
+              "duration_seconds": 2031
+            },
+            {
+              "channel_id": 1524635681522061332,
+              "channel_name": "Ameeron Ka VC",
+              "joined_at": "2026-09-12T10:12:21.251920+00:00",
+              "left_at": "2026-09-12T11:53:38.511830+00:00",
+              "duration_seconds": 6077
+            }
+          ]
+        },
+        "1401979293608706141": {
+          "user_name": "Halo alkane",
+          "total_seconds": 19253,
+          "sessions": [
+            {
+              "channel_id": 1524635681522061332,
+              "channel_name": "Ameeron Ka VC",
+              "joined_at": "2026-09-07T17:37:13.840378+00:00",
+              "left_at": "2026-09-07T18:13:35.951573+00:00",
+              "duration_seconds": 2182
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-08T17:19:11.650894+00:00",
+              "left_at": "2026-09-08T17:25:32.043787+00:00",
+              "duration_seconds": 380
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-08T17:41:51.848552+00:00",
+              "left_at": "2026-09-08T18:08:11.625703+00:00",
+              "duration_seconds": 1579
+            },
+            {
+              "channel_id": 1401597433057771615,
+              "channel_name": "General",
+              "joined_at": "2026-09-08T18:59:38.073636+00:00",
+              "left_at": "2026-09-08T19:45:22.673032+00:00",
+              "duration_seconds": 2744
+            },
+            {
+              "channel_id": 1524635681522061332,
+              "channel_name": "Ameeron Ka VC",
+              "joined_at": "2026-09-09T19:05:11.963890+00:00",
+              "left_at": "2026-09-09T19:42:40.688221+00:00",
+              "duration_seconds": 2248
+            },
+            {
+              "channel_id": 1524635681522061332,
+              "channel_name": "Ameeron Ka VC",
+              "joined_at": "2026-09-11T18:47:11.616419+00:00",
+              "left_at": "2026-09-11T19:55:26.033422+00:00",
+              "duration_seconds": 4094
+            },
+            {
+              "channel_id": 1524635681522061332,
+              "channel_name": "Ameeron Ka VC",
+              "joined_at": "2026-09-12T10:12:22.609651+00:00",
+              "left_at": "2026-09-12T11:52:48.882137+00:00",
+              "duration_seconds": 6026
+            }
+          ]
+        },
+        "944016826751389717": {
+          "user_name": "wesker's apprentice",
+          "total_seconds": 3407,
+          "sessions": [
+            {
+              "channel_id": 1401597433057771615,
+              "channel_name": "General",
+              "joined_at": "2026-09-08T19:03:36.223373+00:00",
+              "left_at": "2026-09-08T19:43:42.886416+00:00",
+              "duration_seconds": 2406
+            },
+            {
+              "channel_id": 1431188276227735624,
+              "channel_name": "MUSHAR",
+              "joined_at": "2026-09-08T19:43:42.887232+00:00",
+              "left_at": "2026-09-08T20:00:24.706764+00:00",
+              "duration_seconds": 1001
+            }
+          ]
+        }
+      }
+    }
+  }
+}
