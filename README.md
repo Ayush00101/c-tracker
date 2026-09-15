@@ -1,7 +1,7 @@
 # Discord Voice Channel Tracker
 
 This bot records how long users spend in a Discord voice channel. Completed
-sessions are saved as readable, indented JSON in `vc_report.txt`.
+sessions are saved as readable, indented JSON in `vc_report.json`.
 
 ## Setup
 
@@ -27,7 +27,7 @@ sessions are saved as readable, indented JSON in `vc_report.txt`.
 8. Start the bot:
 
    ```powershell
-   py bot.py
+   py main.py
    ```
 
 The report file is intentionally excluded from Git by `.gitignore`, because it
@@ -67,6 +67,10 @@ Additional commands include:
   Each completed round shows a five-second countdown before the next round,
   and the duel ends immediately when either fighter wins four rounds.
 - `/lastduel` to view the latest completed duel round summary
+- `/oddeven` to challenge one member to a two-player Odd-Even cricket match;
+  toss and ball choices open in private ephemeral button panels
+- `/offerdraw` to offer a draw during an Odd-Even match
+- `/forfeitgame` to concede an Odd-Even match
 - `/achievements` with weekly, monthly, daily, streak, and 50-hour milestones
 - `/vcstats` for voice-channel rankings
 - `/channelstats` for detailed usage, busiest hours, average sessions, and
@@ -108,7 +112,8 @@ shows GitHub-style `+`/`-` differences against that comparison week.
 
 ## Fun fact bank
 
-[fun_facts.py](./fun_facts.py) contains an offline, template-driven bank of
+[services/fun_facts.py](./services/fun_facts.py) contains an offline,
+template-driven bank of
 1,000 profile facts. It generates different numeric combinations from the
 user's tracked time and avoids recently shown fact IDs when callers provide a
 recent-ID set.
@@ -126,3 +131,23 @@ Current category counts:
 - Programming: 60
 
 Use `choose_fact(total_seconds, recent_ids=...)` to select and render a fact.
+
+## Project structure
+
+- `main.py` is the lean entrypoint and loads every extension in `cogs/`.
+- `cogs/` contains the real slash-command implementations. Each domain module
+  defines its own `@app_commands.command` callbacks and registers them when
+  the cog is loaded:
+  `profile`, `admin`, `fun`, `duel`, `boss`, `quest`, and `stats`.
+- `services/runtime.py` is the shared runtime/state layer: persistence,
+  session tracking, calculations, views, event handlers, and reusable
+  formatting/helpers. Command callbacks import this shared runtime explicitly
+  rather than being registered from the runtime module.
+- `data/` is reserved for non-code data modules. Runtime report files remain
+  controlled by `REPORT_FILE` and are never overwritten by the refactor.
+
+The `legacy/` folder contains compatibility launch/import shims for older
+deployments. The project root intentionally keeps only `main.py` as a Python
+entrypoint; `requirements.txt`, `README.md`, and `PROJECT_HANDOFF.txt` remain
+the primary root-level project files. Use `python -m compileall .`, importing
+`main`, and loading all eight cogs as a structural smoke test.

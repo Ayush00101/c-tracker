@@ -3,3 +3,4 @@ __pycache__/
 *.py[cod]
 vc_report.txt
 duels.json
+data/oddeven_games.json

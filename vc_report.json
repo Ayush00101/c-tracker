@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-12T18:30:46.933718+00:00",
+  "generated_at": "2026-09-15T16:14:38.736209+00:00",
   "guilds": {
     "1401597431522787481": {
       "guild_name": "backchodi ka kila",
@@ -7,7 +7,7 @@
         "779287782928547880": {
           "user_name": "Ayushwa",
           "specific": {
-            "total_seconds": 33781,
+            "total_seconds": 47401,
             "sessions": [
               {
                 "channel_id": 1545821919381561444,
@@ -64,11 +64,32 @@
                 "joined_at": "2026-09-12T09:11:45.132289+00:00",
                 "left_at": "2026-09-12T10:12:19.890508+00:00",
                 "duration_seconds": 3634
+              },
+              {
+                "channel_id": 1545821919381561444,
+                "channel_name": "C Programming Ka Gullam",
+                "joined_at": "2026-09-13T16:15:01.648507+00:00",
+                "left_at": "2026-09-13T18:29:09.380670+00:00",
+                "duration_seconds": 8047
+              },
+              {
+                "channel_id": 1545821919381561444,
+                "channel_name": "C Programming Ka Gullam",
+                "joined_at": "2026-09-14T18:30:32.431187+00:00",
+                "left_at": "2026-09-14T19:12:19.425209+00:00",
+                "duration_seconds": 2506
+              },
+              {
+                "channel_id": 1545821919381561444,
+                "channel_name": "C Programming Ka Gullam",
+                "joined_at": "2026-09-15T15:23:31.022890+00:00",
+                "left_at": "2026-09-15T16:14:38.734222+00:00",
+                "duration_seconds": 3067
               }
             ]
           },
           "other": {
-            "total_seconds": 6254,
+            "total_seconds": 18420,
             "sessions": [
               {
                 "channel_id": 1524635681522061332,
@@ -90,19 +111,58 @@
                 "joined_at": "2026-09-12T17:55:35.228198+00:00",
                 "left_at": "2026-09-12T18:02:03.367589+00:00",
                 "duration_seconds": 388
+              },
+              {
+                "channel_id": 1524635681522061332,
+                "channel_name": "Ameeron Ka VC",
+                "joined_at": "2026-09-13T06:51:06.708253+00:00",
+                "left_at": "2026-09-13T10:13:53.547718+00:00",
+                "duration_seconds": 12166
               }
             ]
           },
-          "daily_streak": 7,
-          "last_active_date": "2026-09-12",
+          "daily_streak": 1,
+          "last_active_date": "2026-09-15",
           "milestones": [],
           "recent_fact_ids": [
-            "dark-071"
+            "dank-007",
+            "dark-071",
+            "dank-243",
+            "gaming-060",
+            "history-001",
+            "dark-107",
+            "history-050",
+            "dank-131",
+            "dark-050",
+            "dank-163",
+            "programming-006",
+            "food-015",
+            "food-048"
+          ],
+          "boss_crowns": 0,
+          "boss_crown_expires_at": "",
+          "quest": {
+            "id": 41,
+            "text": "Spend 25 minutes in **MUSHAR**.",
+            "kind": "voice_minutes",
+            "target": 25,
+            "channel": "MUSHAR",
+            "hint": "Join the named channel and remain there until the required minutes are reached.",
+            "day": "2026-09-15",
+            "assigned_at": "2026-09-14T18:30:47.739931+00:00",
+            "completed": true,
+            "claimable": false,
+            "channel_id": 1437134221499040015,
+            "requested_by": "Ayushwa"
+          },
+          "quests_completed": 2,
+          "powerups": [
+            "poison_splash"
           ]
         },
         "692792854501916742": {
           "user_name": "AyuZen",
-          "total_seconds": 51398,
+          "total_seconds": 102173,
           "sessions": [
             {
               "channel_id": 1545821919381561444,
@@ -208,19 +268,100 @@
               "joined_at": "2026-09-12T17:54:46.295677+00:00",
               "left_at": "2026-09-12T18:18:04.457753+00:00",
               "duration_seconds": 1398
+            },
+            {
+              "channel_id": 1524635681522061332,
+              "channel_name": "Ameeron Ka VC",
+              "joined_at": "2026-09-13T06:47:58.984542+00:00",
+              "left_at": "2026-09-13T10:19:41.848688+00:00",
+              "duration_seconds": 12702
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-13T16:14:28.067666+00:00",
+              "left_at": "2026-09-13T18:59:38.548993+00:00",
+              "duration_seconds": 9910
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-14T10:45:27.958504+00:00",
+              "left_at": "2026-09-14T11:47:07.842849+00:00",
+              "duration_seconds": 3699
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-14T15:45:00.962675+00:00",
+              "left_at": "2026-09-14T17:16:10.977020+00:00",
+              "duration_seconds": 5470
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-15T03:47:32.878169+00:00",
+              "left_at": "2026-09-15T04:41:03.356345+00:00",
+              "duration_seconds": 3210
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-15T04:58:18.928156+00:00",
+              "left_at": "2026-09-15T07:24:07.358940+00:00",
+              "duration_seconds": 8748
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-15T12:35:40.062721+00:00",
+              "left_at": "2026-09-15T13:55:25.386618+00:00",
+              "duration_seconds": 4785
+            },
+            {
+              "channel_id": 1545821919381561444,
+              "channel_name": "C Programming Ka Gullam",
+              "joined_at": "2026-09-15T14:54:38.680420+00:00",
+              "left_at": "2026-09-15T15:32:10.105892+00:00",
+              "duration_seconds": 2251
             }
           ],
-          "daily_streak": 6,
-          "last_active_date": "2026-09-12",
+          "daily_streak": 9,
+          "last_active_date": "2026-09-15",
           "milestones": [],
           "recent_fact_ids": [
+            "dank-250",
+            "sleep-058",
+            "dank-159",
             "history-059",
-            "dank-250"
+            "productivity-015",
+            "programming-053",
+            "programming-018"
+          ],
+          "boss_crowns": 0,
+          "boss_crown_expires_at": "",
+          "quest": {
+            "id": 48,
+            "text": "Complete one full session of at least 30 minutes.",
+            "kind": "long_session",
+            "target": 30,
+            "channel": "MUSHAR",
+            "hint": "Start one uninterrupted session and stay until the required duration is complete.",
+            "day": "2026-09-13",
+            "assigned_at": "2026-09-13T06:51:29.676657+00:00",
+            "completed": true,
+            "claimable": false,
+            "channel_id": 1437134221499040015,
+            "requested_by": "AyuZen"
+          },
+          "quests_completed": 1,
+          "powerups": [
+            "luck_splash"
           ]
         },
         "1401979293608706141": {
           "user_name": "Halo alkane",
-          "total_seconds": 20665,
+          "total_seconds": 36681,
           "sessions": [
             {
               "channel_id": 1524635681522061332,
@@ -277,14 +418,46 @@
               "joined_at": "2026-09-12T17:54:46.295687+00:00",
               "left_at": "2026-09-12T18:18:18.438442+00:00",
               "duration_seconds": 1412
+            },
+            {
+              "channel_id": 1524635681522061332,
+              "channel_name": "Ameeron Ka VC",
+              "joined_at": "2026-09-13T07:47:33.950634+00:00",
+              "left_at": "2026-09-13T10:12:59.739810+00:00",
+              "duration_seconds": 8725
+            },
+            {
+              "channel_id": 1418194016280903771,
+              "channel_name": "GENERAL (EWS)",
+              "joined_at": "2026-09-13T16:17:41.986401+00:00",
+              "left_at": "2026-09-13T18:19:13.634774+00:00",
+              "duration_seconds": 7291
             }
           ],
-          "daily_streak": 1,
-          "last_active_date": "2026-09-12",
+          "daily_streak": 2,
+          "last_active_date": "2026-09-13",
           "milestones": [],
           "recent_fact_ids": [
             "history-004"
-          ]
+          ],
+          "boss_crowns": 0,
+          "boss_crown_expires_at": "",
+          "quest": {
+            "id": 36,
+            "text": "Spend 60 total minutes in voice today.",
+            "kind": "voice_minutes_any",
+            "target": 60,
+            "channel": "Ameeron Ka VC",
+            "hint": "Spend the required total time in any tracked voice channel today.",
+            "day": "2026-09-13",
+            "assigned_at": "2026-09-13T07:50:27.112994+00:00",
+            "completed": false,
+            "claimable": true,
+            "channel_id": 1524635681522061332,
+            "requested_by": "Halo alkane"
+          },
+          "quests_completed": 0,
+          "powerups": []
         },
         "944016826751389717": {
           "user_name": "wesker's apprentice",
@@ -308,16 +481,133 @@
           "daily_streak": 0,
           "last_active_date": "",
           "milestones": [],
-          "recent_fact_ids": []
+          "recent_fact_ids": [],
+          "boss_crowns": 0,
+          "boss_crown_expires_at": "",
+          "quest": null,
+          "quests_completed": 0,
+          "powerups": []
+        },
+        "1180373669608968285": {
+          "user_name": "Dev",
+          "quest": {
+            "id": 22,
+            "text": "Spend 45 minutes in **Ameeron Ka VC**.",
+            "kind": "voice_minutes",
+            "target": 45,
+            "channel": "Ameeron Ka VC",
+            "hint": "Join the named channel and remain there until the required minutes are reached.",
+            "day": "2026-09-13",
+            "assigned_at": "2026-09-13T07:50:39.565282+00:00",
+            "completed": false,
+            "claimable": false,
+            "channel_id": 1401597433057771613,
+            "requested_by": "Dev"
+          }
+        },
+        "1403393214760620092": {
+          "user_name": "manchod",
+          "total_seconds": 2726,
+          "sessions": [
+            {
+              "channel_id": 1418194016280903771,
+              "channel_name": "GENERAL (EWS)",
+              "joined_at": "2026-09-13T17:34:18.521733+00:00",
+              "left_at": "2026-09-13T18:19:45.055632+00:00",
+              "duration_seconds": 2726
+            }
+          ],
+          "daily_streak": 1,
+          "last_active_date": "2026-09-13",
+          "milestones": []
         }
       },
-      "goals": {},
-      "guild_id": 1401597431522787481
+      "goals": {
+        "779287782928547880": {
+          "daily": {
+            "hours": 4.0,
+            "created_at": "2026-09-13T07:31:53.462523+00:00"
+          }
+        }
+      },
+      "guild_id": 1401597431522787481,
+      "boss_battle": {
+        "status": "ended_by_owner",
+        "name": "The Session Serpent of 1541",
+        "guild_id": 1401597431522787481,
+        "started_at": "2026-09-13T10:11:08.417912+00:00",
+        "expires_at": "2026-09-14T10:11:08.417912+00:00",
+        "hp_points": 200000,
+        "participants": {
+          "692792854501916742": {
+            "name": "AyuZen"
+          },
+          "779287782928547880": {
+            "name": "Ayushwa"
+          },
+          "1401979293608706141": {
+            "name": "Halo alkane"
+          }
+        },
+        "summoned_member_ids": [
+          692792854501916742,
+          779287782928547880,
+          1401979293608706141
+        ],
+        "alerts": [
+          1,
+          2
+        ],
+        "effects": [
+          {
+            "type": "poison_splash",
+            "user_id": 779287782928547880,
+            "started_at": "2026-09-13T10:11:50.547731+00:00",
+            "expires_at": "2026-09-13T10:21:50.547731+00:00",
+            "weakened_members": [],
+            "boss_effect": "Poisoned: loses 0.03% max HP every 10 seconds",
+            "activation_message": "\u2620\ufe0f Poison is active for 10 minutes."
+          }
+        ],
+        "damage_snapshot": {
+          "692792854501916742": 30000,
+          "779287782928547880": 16500,
+          "1401979293608706141": 11100
+        },
+        "last_damage_update": "2026-09-13T10:16:09.058834+00:00",
+        "ended_at": "2026-09-13T10:16:55.959331+00:00",
+        "ended_by": 779287782928547880
+      }
     }
   },
   "cprofile_users": [],
   "weekly_state": {
     "period_start": "2026-09-12T18:30:00+00:00",
-    "users": {}
+    "users": {
+      "692792854501916742": {
+        "rank_index": 2,
+        "notified_rank_index": 2,
+        "label": "C ka Bacha Hai Tu",
+        "weekly_seconds": 50775
+      },
+      "779287782928547880": {
+        "rank_index": 1,
+        "notified_rank_index": 1,
+        "label": "Tip Of Dihh",
+        "weekly_seconds": 25786
+      },
+      "1401979293608706141": {
+        "rank_index": 0,
+        "notified_rank_index": -1,
+        "label": "Chodu",
+        "weekly_seconds": 16016
+      },
+      "1403393214760620092": {
+        "rank_index": 0,
+        "notified_rank_index": -1,
+        "label": "Chodu",
+        "weekly_seconds": 2726
+      }
+    }
   }
 }

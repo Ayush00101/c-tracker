@@ -11,11 +11,37 @@ goals, comparisons, facts, and fun features.
 Repository
 ----------
 Project path: D:\Ayush\music tracker bot
-Main file: bot.py
+Main file: main.py
 Runtime: Python 3.12 on Windows
 Dependencies:
   - discord.py>=2.4,<3
   - python-dotenv>=1.0,<2
+
+Architecture after the command refactor
+----------------------------------------
+`main.py` owns application assembly and loads all eight extensions listed in
+`COG_MODULES`. The command implementations are no longer stored in the
+runtime module:
+
+  cogs/profile.py  profile, cprofile, add, achievements, progress, timeline
+  cogs/admin.py    history, csv, current
+  cogs/fun.py      roulette, lobotomykaisen, museum
+  cogs/duel.py     duel, lastduel
+  cogs/oddeven.py  oddeven, offerdraw, forfeitgame
+  cogs/boss.py     bossbattle, endboss, powerups
+  cogs/quest.py    quest
+  cogs/stats.py    recap, goal, mygoal, timecapsule, leaderboard,
+                   channelstats, heatmap, vcstats
+
+Each module contains the corresponding `@app_commands.command` callback and
+registers it from its extension setup function. `services/runtime.py` is the
+shared dependency layer: report persistence, active-session state, event
+handlers, calculations, embeds/views, and reusable helpers. This keeps the
+stateful behavior shared without introducing cog/runtime import cycles.
+`legacy/` contains compatibility launch/import shims; the active entrypoint is
+`main.py`.
+The refactor preserves all 26 slash commands and does not rewrite
+`vc_report.json` or `.env`.
 
 Safe startup
 ------------
@@ -28,7 +54,7 @@ Safe startup
      pip install -r requirements.txt
 4. Configure .env using .env.example.
 5. Run:
-     py bot.py
+     py main.py
 
 Environment variables
 ---------------------
@@ -46,7 +72,7 @@ REPORT_FILE
 
 Persistence and compatibility
 -----------------------------
-bot.py loads REPORT_FILE as JSON and preserves existing guilds, users, sessions,
+The runtime loads REPORT_FILE as JSON and preserves existing guilds, users, sessions,
 and unknown fields. It adds missing schema defaults in memory. Data is saved
 atomically through a temporary file and replace operation.
 
@@ -199,7 +225,7 @@ Current slash commands
 
 Duel persistence
 ----------------
-duel.py contains phase/date helpers and JSON persistence. Duel results are
+`services/duel.py` contains phase/date helpers and JSON persistence. Duel results are
 stored in duels.json (ignored by Git) and loaded at startup. The store records
 the fighters, selected week, winner, round totals, and daily round summaries.
 Only one active duel may involve a user at a time.
@@ -229,7 +255,7 @@ notifications are sent to the member and achievement channel
 
 Facts
 -----
-fun_facts.py contains an offline 1,000-entry template bank:
+`services/fun_facts.py` contains an offline 1,000-entry template bank:
   dank 250, dark 200, adult 150, history 80, gaming 70,
   productivity 70, food 60, sleep 60, programming 60.
 
@@ -269,7 +295,7 @@ Recent history and user preferences
 Recommended validation
 ----------------------
 Syntax:
-  py -3 -m py_compile bot.py fun_facts.py
+  py -3 -m py_compile main.py services/*.py cogs/*.py
 
 Command inventory:
   import bot
@@ -282,10 +308,10 @@ Expected command names:
 
 Known caveats for the next agent
 --------------------------------
-- The README may describe some older behavior; treat bot.py as authoritative.
+- The README and `main.py` are authoritative for the current structured app.
 - The report schema is backward-compatible for the existing JSON structure but
   arbitrary plaintext reports require a migration, not direct loading.
 - Slash commands synchronize to TRACKED_GUILD_ID on bot ready for fast testing.
 - Discord title text cannot have independently colored substrings.
 - Do not expose the real .env token or copy it into any response or commit.
-- Before adding a feature, search bot.py for existing helpers and reuse them.
+- Before adding a feature, search `services/` and the relevant cog for existing helpers and reuse them.
